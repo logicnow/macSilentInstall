@@ -6,7 +6,7 @@ Use of RM's Active Discovery Push Install feature is the preferred way to deploy
 Requires OS X Agent 1.5.1 or better
 
 Run the script with the 4 required variables.
-Example: /path/to/osxSilentInstall.sh username password client site [--registeronly]
+Example: /path/to/macSilentInstall.sh username password client site [--registeronly]
 
 'username' is the username (likely email address) you use to log in the MAX Remote Management Dashboard
 'password' is the corresponding password for the username, which will appear in clear text in your command. See below.
