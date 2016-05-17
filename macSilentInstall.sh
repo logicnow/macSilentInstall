@@ -30,7 +30,7 @@ rmSite="$4"
 # check for arguments
 if [ "$rmUsername" == "" ]; then
     echo "Variables must be specified as arguments or hard-coded into the script."
-    echo "Example: /path/to/script username password client site"
+    echo "Example: /path/to/macSilentInstall.sh username password client site"
     echo "Run the script with -? for more help"
     exit 2
 fi
@@ -39,7 +39,7 @@ fi
 if [ "$rmUsername" == "-?" ]; then
     echo "This script will download, install, and register the MAX Remote Management OS X Agent."
     echo "Run the script with the 4 required variables."
-    echo "Example: /path/to/script username password client site [--registeronly]"
+    echo "Example: /path/to/macSilentInstall.sh username password client site [--registeronly]"
     echo ""
     echo "'username' is the username (likely email address) you use to log in the MAX Remote Management Dashboard"
     echo "'password' is the corresponding password for the username, which will appear in clear text in your command. See below."
