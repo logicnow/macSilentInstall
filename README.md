@@ -17,3 +17,5 @@ Adding '--registeronly' will skip the download/install and simply register the a
 Bear that in mind with your deployment method your password will be sent in clear text.
 Please use a Standard user account to protect your dashboard, read this for a safety tip:
 http://www.allthingsmax.com/2011/11/security-best-practices-in-max.html
+
+If you choose to execute the script via SSH, be sure to call with bash or set executable bit (e.g. sudo chmod u+x /path/to/macSilentInstall.sh)
