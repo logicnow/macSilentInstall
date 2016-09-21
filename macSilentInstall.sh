@@ -8,6 +8,7 @@
 # v1.1 properly dismounts the disk image, checks for root privs
 # v1.1.1 uses OS X Agent 1.5.3 and -C -S to create client site as needed
 # v1.2 does a little song and dance with -C -S -c -s to get good enrollment
+# v1.3 fixes rmmagent syntax for creating client, site
 
 # VARIABLES
 # you can specify variables as command-line arguments when running the script
@@ -108,7 +109,7 @@ fi #regOnly check
 if [ -e /usr/local/rmmagent/rmmagentd ]; then
     # little oddity requires wd to be parent folder
     cd /usr/local/rmmagent
-    ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -C "$rmClient" -S "$rmSite"
+    ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -C -c "$rmClient" -S -s "$rmSite"
     if [ $? -ne 0 ]; then
         # let's do the registration dance
         echo "Registration could not create client and site. Trying existing."
@@ -126,7 +127,7 @@ if [ -e /usr/local/rmmagent/rmmagentd ]; then
             *)
                 # try creating site only
                 echo "Registration doesn't have existing client and site. Trying to create Site."
-                ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -S "$rmSite"
+                ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -S -s "$rmSite"
                 if [ $? -ne 0 ]; then
                     #fail.
                     echo "Registration failed. You may need to register this computer manually."
