@@ -1,7 +1,7 @@
 # macSilentInstall
-A script for use with Apple deployment tools (like Apple Remote Desktop) for deploying/enrolling the MAX Remote Management OS X Agent.
+A script for use with SSH or other Apple deployment tools (like Apple Remote Desktop) for deploying/enrolling the SolarWinds MSP Remote Monitoring & Management Agent for Mac.
 
-Use of RM's Active Discovery Push Install feature is the preferred way to deploy the OS X Agent, but in situations where that's not feasible, doesn't meet the minimum requirements, or existing deployment tools are already in place this may provide an alternative.
+Use of MSP RMM's Active Discovery Push Install feature is the preferred way to deploy the Agent, but in situations where that's not feasible, doesn't meet the minimum requirements, or existing deployment tools are already in place this may provide an alternative.
 
 Requires OS X Agent 1.5.1 or better
 
@@ -17,6 +17,8 @@ Example: /path/to/macSilentInstall.sh username password client site [--registero
 'site' is the site of the above client that you wish to assign to the computer running this script
 
 Adding '--registeronly' will skip the download/install and simply register the agent
+
+Adding '--rc' will download and install the newest Release Candidate version of the agent
 
 Bear that in mind with this deployment method your password may be sent in clear text. We recommend setting up a new SuperUser account and/or logging in to the Dashboard with that, and then setting your Agent Key user to not be able to access the dashboard. Then use the Agent Key credentials in this script. 
 
