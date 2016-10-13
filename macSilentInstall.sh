@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# LOGICnow MAX Remote Management OS X Agent Silent Install and Registration
+# SolarWinds MSP Remote Monitoring & Management Agent for Mac Silent Install and Registration
 # Requires OS X Agent 1.5.3 or better
 
 # by Brian J Best, Apple Strategist
@@ -9,13 +9,14 @@
 # v1.1.1 uses OS X Agent 1.5.3 and -C -S to create client site as needed
 # v1.2 does a little song and dance with -C -S -c -s to get good enrollment
 # v1.3 fixes rmmagent syntax for creating client, site
+# v1.4 adds support for installing Mac Agent 2.0.0 RC on demand, rebranding from Apple and SolarWinds MSP
 
 # VARIABLES
 # you can specify variables as command-line arguments when running the script
 # or if you'd rather you can replace these
 # all of these must present to register properly, please put proper values inside the quotation marks
 
-# this is the username (likely email address) you use to log in the MAX Remote Management Dashboard
+# this is the username (likely email address) you use to log in the MSP RMM Dashboard
 rmUsername="$1"
 
 # this is the corresponding password for the username 
@@ -40,19 +41,20 @@ fi
 
 # display help
 if [ "$rmUsername" == "-?" ]; then
-    echo "This script will download, install, and register the MAX Remote Management OS X Agent."
+    echo "This script will download, install, and register the SolarWinds MSP Remote Monitoring & Management Agent for Mac."
     echo "Run the script with the 4 required variables."
-    echo "Example: /path/to/macSilentInstall.sh username password client site [--registeronly]"
+    echo "Example: /path/to/macSilentInstall.sh username password client site [--registeronly] [--rc]"
     echo ""
-    echo "'username' is the username (ideally the Agent Key) you use to log in the MAX Remote Management Dashboard"
+    echo "'username' is the username (ideally the Agent Key) you use to log in the SolarWinds MSP RMM Dashboard"
     echo "'password' is the corresponding password for the username, which will appear in clear text in your command. See below."
     echo "'client' is the client name you wish to assign to the computer running this script"
     echo "'site' is the site of the above client that you wish to assign to the computer running this script"
+    echo ""
     echo "Adding '--registeronly' will skip the download/install and simply register the agent"
+    echo "Adding '--rc' will download and install the newest Release Candidate version of the agent"
     echo ""
     echo "Bear that in mind with your deployment method your password will be sent in clear text."
-    echo "Please consider using the Agent Key user account with Dashboard Access disabled, read this for a safety tip:"
-    echo "http://www.allthingsmax.com/2011/11/security-best-practices-in-max.html"
+    echo "Please consider using the Agent Key user account with Dashboard Access disabled."
     exit 0
 fi
 
@@ -77,9 +79,16 @@ if [ "$5" == "--registeronly" ]; then
     regOnly=1
 fi
 
+#if user has specified they want the RC agent, they'll add it to the end
+if [ "$5" == "--rc" ]; then
+	agentVers="macagent200"
+else
+	agentVers="osxagent153"
+fi
+
 if [ ${regOnly:-0} -eq 0 ]; then
 # download the agent installer
-curl -o "/private/tmp/osxagent-$randomID.dmg" "https://www.mac-msp.com/osxagent153.dmg"
+curl -o "/private/tmp/osxagent-$randomID.dmg" "https://www.mac-msp.com/$agentVers.dmg"
 #TODO - may need to replace this download link at some point
 
 # mount the DMG, specify the mountpoint since the DMG volume name might change later
@@ -137,15 +146,17 @@ if [ -e /usr/local/rmmagent/rmmagentd ]; then
     fi
 else
     if [ ${regOnly:-0} -eq 1 ]; then
-        echo "OS X Agent does not appear to be installed. Please re-run without --registeronly."
+        echo "Agent does not appear to be installed. Please re-run without --registeronly."
     else
-        echo "OS X Agent does not appear to be installed. Something went horribly wrong."
+        echo "Agent does not appear to be installed. Something went horribly wrong."
     fi
     exit 2
 fi
 
 # sanity check 
-regCheck=`grep 'Mac OSX agent is registered successfully.' /usr/local/rmmagent/log/rmmagentd.log`
+# 1.5.3 uses string "Mac OSX agent is registered successfully."
+# 2.0.0 uses string "Agent is registered successfully."
+regCheck=`grep 'gent is registered successfully.' /usr/local/rmmagent/log/rmmagentd.log`
 if [ "$regCheck" == "" ]; then
     echo "Something went wrong. Please check the variables and try again or register manually."
     exit 2
