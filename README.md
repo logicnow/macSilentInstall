@@ -3,8 +3,6 @@ A script for use with SSH or other Apple deployment tools (like Apple Remote Des
 
 Use of MSP RMM's Active Discovery Push Install feature is the preferred way to deploy the Agent, but in situations where that's not feasible, doesn't meet the minimum requirements, or existing deployment tools are already in place this may provide an alternative.
 
-Requires OS X Agent 1.5.1 or better
-
 Run the script with the 4 required variables.
 Example: /path/to/macSilentInstall.sh username password client site [--registeronly] [--rc]
 
