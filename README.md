@@ -6,7 +6,7 @@ Use of MSP RMM's Active Discovery Push Install feature is the preferred way to d
 Requires OS X Agent 1.5.1 or better
 
 Run the script with the 4 required variables.
-Example: /path/to/macSilentInstall.sh username password client site [--registeronly]
+Example: /path/to/macSilentInstall.sh username password client site [--registeronly] [--rc]
 
 'username' is the username (likely email address) you use to log in the MAX Remote Management Dashboard
 
