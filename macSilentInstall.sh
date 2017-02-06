@@ -10,6 +10,7 @@
 # v1.2 does a little song and dance with -C -S -c -s to get good enrollment
 # v1.3 fixes rmmagent syntax for creating client, site
 # v1.4 adds support for installing Mac Agent 2.0.0 RC on demand, rebranding from Apple and SolarWinds MSP
+# v1.5 update to be version independent, we will handle the RC/GA versions on the server side
 
 # VARIABLES
 # you can specify variables as command-line arguments when running the script
@@ -81,27 +82,27 @@ fi
 
 #if user has specified they want the RC agent, they'll add it to the end
 if [ "$5" == "--rc" ]; then
-	agentVers="macagent200"
+	agentVers="macagentrc"
 else
-	agentVers="osxagent153"
+	agentVers="macagentga"
 fi
 
 if [ ${regOnly:-0} -eq 0 ]; then
 # download the agent installer
-curl -o "/private/tmp/osxagent-$randomID.dmg" "https://www.mac-msp.com/$agentVers.dmg"
+curl -o "/private/tmp/macagent-$randomID.dmg" "https://www.mac-msp.com/$agentVers.dmg"
 #TODO - may need to replace this download link at some point
 
 # mount the DMG, specify the mountpoint since the DMG volume name might change later
-hdiutil attach -nobrowse -mountpoint "/Volumes/osxagent-$randomID" "/private/tmp/osxagent-$randomID.dmg"
+hdiutil attach -nobrowse -mountpoint "/Volumes/macagent-$randomID" "/private/tmp/macagent-$randomID.dmg"
 
 # sanity check, did we mount and look OK? Download may have failed or could be corrupted.
-if [ $? -ne 0 ] || [ ! -e "/Volumes/osxagent-$randomID" ]; then
+if [ $? -ne 0 ] || [ ! -e "/Volumes/macagent-$randomID" ]; then
     echo "Unable to mount the downloaded disk image. Check Internet connectivity and try again."
     exit 2
 fi
 
 # install it
-installer -pkg "/Volumes/osxagent-$randomID/Advanced Monitoring Agent.pkg" -target /
+installer -pkg "/Volumes/macagent-$randomID/Advanced Monitoring Agent.pkg" -target /
 
 # sanity check
 if [ $? -ne 0 ] || [ ! -e /usr/local/rmmagent/rmmagentd ]; then
@@ -109,21 +110,21 @@ if [ $? -ne 0 ] || [ ! -e /usr/local/rmmagent/rmmagentd ]; then
     exit 2
 else
     # all done, detach the image
-    hdiutil detach "/Volumes/osxagent-$randomID"
+    hdiutil detach "/Volumes/macagent-$randomID"
 fi
 
 fi #regOnly check
 
 # enroll in RM
 if [ -e /usr/local/rmmagent/rmmagentd ]; then
-    # little oddity requires wd to be parent folder
+    # little oddity requires wd to be parent folder (might be fixed in 2.1)
     cd /usr/local/rmmagent
     ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -C -c "$rmClient" -S -s "$rmSite"
     if [ $? -ne 0 ]; then
         # let's do the registration dance
         echo "Registration could not create client and site. Trying existing."
         #no joy in creating client/site, maybe already there?
-        regAtt2=`./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -s "$rmSite"`
+        regAtt2=`./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -s "$rmSite" 2>&1`
         if [ $? -ne 0 ]; then
             #nope.
             case "$regAtt2" in
