@@ -119,12 +119,12 @@ fi #regOnly check
 if [ -e /usr/local/rmmagent/rmmagentd ]; then
     # little oddity requires wd to be parent folder (might be fixed in 2.1)
     cd /usr/local/rmmagent
-    ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -C -c "$rmClient" -S -s "$rmSite"
+    ./rmmagentd register -q -u"$rmUsername" -p"$rmPass" -C -c"$rmClient" -S -s"$rmSite"
     if [ $? -ne 0 ]; then
         # let's do the registration dance
         echo "Registration could not create client and site. Trying existing."
         #no joy in creating client/site, maybe already there?
-        regAtt2=`./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -s "$rmSite" 2>&1`
+        regAtt2=`./rmmagentd register -q -u"$rmUsername" -p"$rmPass" -c"$rmClient" -s"$rmSite" 2>&1`
         if [ $? -ne 0 ]; then
             #nope.
             case "$regAtt2" in
@@ -137,7 +137,7 @@ if [ -e /usr/local/rmmagent/rmmagentd ]; then
             *)
                 # try creating site only
                 echo "Registration doesn't have existing client and site. Trying to create Site."
-                ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -S -s "$rmSite"
+                ./rmmagentd register -q -u"$rmUsername" -p"$rmPass" -c"$rmClient" -S -s"$rmSite"
                 if [ $? -ne 0 ]; then
                     #fail.
                     echo "Registration failed. You may need to register this computer manually."
