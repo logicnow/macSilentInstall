@@ -11,6 +11,7 @@
 # v1.3 fixes rmmagent syntax for creating client, site
 # v1.4 adds support for installing Mac Agent 2.0.0 RC on demand, rebranding from Apple and SolarWinds MSP
 # v1.5 update to be version independent, we will handle the RC/GA versions on the server side
+# v1.6 updated for RC 2.2 which changes the registration process with a new verb
 
 # VARIABLES
 # you can specify variables as command-line arguments when running the script
@@ -117,14 +118,21 @@ fi #regOnly check
 
 # enroll in RM
 if [ -e /usr/local/rmmagent/rmmagentd ]; then
-    # little oddity requires wd to be parent folder (might be fixed in 2.1)
-    cd /usr/local/rmmagent
-    ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -C -c "$rmClient" -S -s "$rmSite"
+    # check on installed version
+    installedVersion=`/usr/local/rmmagent/rmmagentd -v | awk '{ print $2 }'`
+    if [[ "$installedVersion" == "2.2."* ]]; then
+        #TODO - this can be removed when 2.2 goes GA
+        registerVerb='register'
+        insertEquals='='
+    else
+        insertEquals=' '
+    fi
+    /usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -C -c$insertEquals"$rmClient" -S -s$insertEquals"$rmSite"
     if [ $? -ne 0 ]; then
         # let's do the registration dance
         echo "Registration could not create client and site. Trying existing."
         #no joy in creating client/site, maybe already there?
-        regAtt2=`./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -s "$rmSite" 2>&1`
+        regAtt2=`/usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -c$insertEquals"$rmClient" -s$insertEquals"$rmSite" 2>&1`
         if [ $? -ne 0 ]; then
             #nope.
             case "$regAtt2" in
@@ -137,7 +145,7 @@ if [ -e /usr/local/rmmagent/rmmagentd ]; then
             *)
                 # try creating site only
                 echo "Registration doesn't have existing client and site. Trying to create Site."
-                ./rmmagentd -q -u "$rmUsername" -p "$rmPass" -c "$rmClient" -S -s "$rmSite"
+                /usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -c$insertEquals"$rmClient" -S -s$insertEquals"$rmSite"
                 if [ $? -ne 0 ]; then
                     #fail.
                     echo "Registration failed. You may need to register this computer manually."
