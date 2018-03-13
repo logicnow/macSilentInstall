@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # SolarWinds MSP Remote Monitoring & Management Agent for Mac Silent Install and Registration
-# Requires OS X Agent 1.5.3 or better
+# Requires Mac Agent 2.3.1 or better
 
 # by Brian J Best, Apple Strategist
 # v1.0 initial release
@@ -12,6 +12,7 @@
 # v1.4 adds support for installing Mac Agent 2.0.0 RC on demand, rebranding from Apple and SolarWinds MSP
 # v1.5 update to be version independent, we will handle the RC/GA versions on the server side
 # v1.6 updated for RC 2.2 which changes the registration process with a new verb
+# v1.7 removed old verbiage (and most changes from 1.6) since we are now only doing Agent 2.3.1 and up
 
 # VARIABLES
 # you can specify variables as command-line arguments when running the script
@@ -118,21 +119,12 @@ fi #regOnly check
 
 # enroll in RM
 if [ -e /usr/local/rmmagent/rmmagentd ]; then
-    # check on installed version
-    installedVersion=`/usr/local/rmmagent/rmmagentd -v | awk '{ print $2 }'`
-    if [[ "$installedVersion" == "2.2."* ]]; then
-        #TODO - this can be removed when 2.2 goes GA
-        registerVerb='register'
-        insertEquals='='
-    else
-        insertEquals=' '
-    fi
-    /usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -C -c$insertEquals"$rmClient" -S -s$insertEquals"$rmSite"
+    /usr/local/rmmagent/rmmagentd register --quiet -u"$rmUsername" -p"$rmPass" -C -c"$rmClient" -S -s"$rmSite"
     if [ $? -ne 0 ]; then
         # let's do the registration dance
         echo "Registration could not create client and site. Trying existing."
         #no joy in creating client/site, maybe already there?
-        regAtt2=`/usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -c$insertEquals"$rmClient" -s$insertEquals"$rmSite" 2>&1`
+        regAtt2=`/usr/local/rmmagent/rmmagentd register --quiet -u"$rmUsername" -p"$rmPass" -c"$rmClient" -s"$rmSite" 2>&1`
         if [ $? -ne 0 ]; then
             #nope.
             case "$regAtt2" in
@@ -145,7 +137,7 @@ if [ -e /usr/local/rmmagent/rmmagentd ]; then
             *)
                 # try creating site only
                 echo "Registration doesn't have existing client and site. Trying to create Site."
-                /usr/local/rmmagent/rmmagentd $registerVerb -q -u$insertEquals"$rmUsername" -p$insertEquals"$rmPass" -c$insertEquals"$rmClient" -S -s$insertEquals"$rmSite"
+                /usr/local/rmmagent/rmmagentd register --quiet -u"$rmUsername" -p"$rmPass" -c"$rmClient" -S -s"$rmSite"
                 if [ $? -ne 0 ]; then
                     #fail.
                     echo "Registration failed. You may need to register this computer manually."
